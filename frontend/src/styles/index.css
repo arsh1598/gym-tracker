@@ -1800,19 +1800,30 @@ input[type="date"] {
     display: flex;
     gap: 8px;
     margin-bottom: 12px;
+    align-self: start;
+    width: 100%;
   }
   
   .mobile-top-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
-    padding: 8px 12px;
+    padding: 10px 12px;
     border-radius: 20px;
     color: var(--text-primary);
     font-size: 0.85rem;
     font-weight: 600;
+  }
+
+  .mobile-top-btn:first-child {
+    flex: 1;
+  }
+
+  .mobile-top-btn:last-child {
+    flex: 0 0 60px;
   }
   
   .calendar-panel-wrapper {
