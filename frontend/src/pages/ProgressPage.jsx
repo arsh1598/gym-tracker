@@ -69,6 +69,14 @@ export default function ProgressPage() {
   const [recentExercises, setRecentExercises] = useState([])
   const dropdownRef = useRef(null)
   
+  const [exerciseSearch, setExerciseSearch] = useState('')
+
+  useEffect(() => {
+    if (selectedExercise) {
+      setExerciseSearch(selectedExercise.name)
+    }
+  }, [selectedExercise])
+  
   const [startDate, setStartDate] = useState(format(subMonths(new Date(), 3), 'yyyy-MM-dd'))
   const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   
@@ -197,41 +205,54 @@ export default function ProgressPage() {
             {viewMode === 'exercise' && (
               <div className="control-group" style={{ flex: 2, position: 'relative' }} ref={dropdownRef}>
                 <div className="control-label">Exercise</div>
-                <button
-                  className="exercise-dropdown-trigger"
-                  onClick={() => setDropdownOpen(prev => !prev)}
-                >
-                  <span
-                    className="exercise-dropdown-value"
-                    style={!selectedExercise ? { color: 'var(--text-muted)' } : {}}
-                  >
-                    {selectedExercise ? selectedExercise.name : 'Select an exercise...'}
-                  </span>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    className="input"
+                    placeholder="Search exercise..."
+                    value={exerciseSearch}
+                    onChange={e => {
+                      setExerciseSearch(e.target.value)
+                      setDropdownOpen(true)
+                    }}
+                    onFocus={() => setDropdownOpen(true)}
+                  />
                   <ChevronDown
                     size={16}
+                    style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}
                     className={`exercise-dropdown-chevron ${dropdownOpen ? 'open' : ''}`}
+                    onClick={() => setDropdownOpen(prev => !prev)}
                   />
-                </button>
+                </div>
                 {dropdownOpen && (
                   <div className="exercise-dropdown-menu">
-                    <div className="exercise-dropdown-header">
-                      <Clock size={13} />
-                      Recent Exercises
-                    </div>
-                    {recentExercises.length === 0 ? (
-                      <div className="exercise-dropdown-empty">No recent exercises found</div>
-                    ) : (
-                      recentExercises.map(ex => (
-                        <div
-                          key={ex.id}
-                          className={`exercise-dropdown-item ${selectedExercise?.id === ex.id ? 'active' : ''}`}
-                          onClick={() => { setSelectedExercise(ex); setDropdownOpen(false) }}
-                        >
-                          <span className="exercise-dropdown-name">{ex.name}</span>
-                          <span className="exercise-dropdown-muscle">{ex.targetMuscle}</span>
-                        </div>
-                      ))
-                    )}
+                    {(() => {
+                      const displayExercises = exerciseSearch && exerciseSearch !== selectedExercise?.name
+                        ? exercises.filter(ex => ex.name.toLowerCase().includes(exerciseSearch.toLowerCase()))
+                        : recentExercises;
+
+                      return (
+                        <>
+                          <div className="exercise-dropdown-header">
+                            <Clock size={13} />
+                            {exerciseSearch && exerciseSearch !== selectedExercise?.name ? 'Search Results' : 'Recent Exercises'}
+                          </div>
+                          {displayExercises.length === 0 ? (
+                            <div className="exercise-dropdown-empty">No exercises found</div>
+                          ) : (
+                            displayExercises.map(ex => (
+                              <div
+                                key={ex.id}
+                                className={`exercise-dropdown-item ${selectedExercise?.id === ex.id ? 'active' : ''}`}
+                                onClick={() => { setSelectedExercise(ex); setDropdownOpen(false); setExerciseSearch(ex.name); }}
+                              >
+                                <span className="exercise-dropdown-name">{ex.name}</span>
+                                <span className="exercise-dropdown-muscle">{ex.targetMuscle}</span>
+                              </div>
+                            ))
+                          )}
+                        </>
+                      )
+                    })()}
                   </div>
                 )}
               </div>

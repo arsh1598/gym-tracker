@@ -1847,4 +1847,18 @@ input[type="date"] {
     grid-template-columns: 24px 1fr 1fr 1fr 30px 40px;
     gap: 2px;
   }
+
+  /* Workouts Page Scroll Fix */
+  .workout-editor {
+    height: auto;
+    overflow: visible;
+  }
+  .workout-editor-scrollable {
+    overflow-y: visible;
+  }
+
+  /* PRs Page Grid Fix */
+  .prs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
