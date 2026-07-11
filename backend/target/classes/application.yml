@@ -1,25 +1,22 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/gym_tracker
-    username: gymuser
-    password: gympassword
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/gym_tracker}
+    username: ${DATABASE_USERNAME:gymuser}
+    password: ${DATABASE_PASSWORD:gympassword}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${DDL_AUTO:update}
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-  sql:
-    init:
-      mode: always
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 logging:
   level:
-    com.gymtracker: DEBUG
-    org.hibernate.SQL: DEBUG
+    com.gymtracker: INFO
+    org.hibernate.SQL: WARN

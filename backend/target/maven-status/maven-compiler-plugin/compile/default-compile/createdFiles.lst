@@ -13,6 +13,7 @@ com/gymtracker/entity/WorkoutExercise.class
 com/gymtracker/service/WorkoutService$MonthlySummaryDto.class
 com/gymtracker/service/WorkoutService.class
 com/gymtracker/config/CorsConfig.class
+com/gymtracker/config/SpaController.class
 com/gymtracker/entity/Workout$WorkoutBuilder.class
 com/gymtracker/dto/WorkoutRequest.class
 com/gymtracker/dto/SetDto$SetDtoBuilder.class
