@@ -1,28 +1,32 @@
 package com.gymtracker.config;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
-/**
- * Forwards all non-API, non-static requests to index.html so that
- * React Router can handle client-side navigation.
- *
- * Spring Boot serves actual static files (JS, CSS, images) directly
- * from resources/static — this controller only catches routes that
- * don't match any file or @RestController mapping.
- */
-@Controller
-public class SpaController {
+import java.io.IOException;
 
-    // Catch everything that:
-    //  - doesn't start with /api  (handled by @RestControllers)
-    //  - doesn't contain a dot    (so .js, .css, .png etc. are served as files)
-    @RequestMapping(value = {
-        "/",
-        "/{path:^(?!api)[^\\.]*}",
-        "/{path:^(?!api)[^\\.]*}/**"
-    })
-    public String forward() {
-        return "forward:/index.html";
+@Configuration
+public class SpaController implements WebMvcConfigurer {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/")
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver() {
+                    @Override
+                    protected Resource getResource(String resourcePath, Resource location) throws IOException {
+                        Resource requestedResource = location.createRelative(resourcePath);
+                        if (requestedResource.exists() && requestedResource.isReadable()) {
+                            return requestedResource;
+                        }
+                        // Fall back to index.html for React Router
+                        return new ClassPathResource("/static/index.html");
+                    }
+                });
     }
 }
