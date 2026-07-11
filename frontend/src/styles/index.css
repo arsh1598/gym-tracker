@@ -1770,3 +1770,81 @@ textarea.input {
 input[type="date"] {
   color-scheme: dark;
 }
+
+/* ========================
+   MOBILE RESPONSIVENESS
+   ======================== */
+@media (max-width: 768px) {
+  /* Page Layout */
+  .page-container {
+    padding: 12px;
+    padding-bottom: 80px; /* Space for bottom navbar */
+    overflow-y: auto;
+  }
+
+  .workouts-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    overflow-y: visible; 
+  }
+
+  /* Navbar to Bottom Tab Bar */
+  .navbar {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    padding: 0 10px;
+    justify-content: center;
+    border-bottom: none;
+    border-top: 1px solid var(--border-subtle);
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 1000;
+  }
+
+  .navbar-brand, .navbar-right {
+    display: none; /* Hide brand and profile on mobile tabs */
+  }
+
+  .navbar-nav {
+    position: static;
+    transform: none;
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .nav-link {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.65rem;
+    padding: 6px 4px;
+  }
+
+  /* Progress Page Layout */
+  .progress-content-wrapper {
+    flex-direction: column;
+  }
+  
+  .progress-content-wrapper > .chart-container {
+    flex: 1 1 100% !important;
+  }
+  
+  .progress-content-wrapper > div:not(.chart-container) {
+    flex: 1 1 100% !important;
+    min-height: auto !important;
+  }
+
+  /* Sets Table layout */
+  .sets-table-header {
+    grid-template-columns: 24px 1fr 1fr 1fr 30px 40px;
+    font-size: 0.6rem;
+    gap: 2px;
+  }
+
+  .set-row {
+    grid-template-columns: 24px 1fr 1fr 1fr 30px 40px;
+    gap: 2px;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "GymTracker",
+  "short_name": "GymTracker",
+  "description": "Your Personal Powerlifting Journal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1526",
+  "theme_color": "#0d1526",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

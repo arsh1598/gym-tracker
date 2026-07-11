@@ -280,9 +280,12 @@ export default function ProgressPage() {
         {viewMode === 'exercise' ? (
           (() => {
             const showBestSets = metric === 'bestSetVolume' && selectedExercise && !loadingChart && chartData?.filter(d => d?.bestSetVolume > 0).length > 0;
+            const showTopSets = metric === 'maxWeight' && selectedExercise && !loadingChart && chartData?.filter(d => d?.maxWeight > 0).length > 0;
+            const showSideBox = showBestSets || showTopSets;
+            
             return (
-              <div style={{ display: 'flex', gap: 24, width: '100%' }}>
-                <div className="chart-container" style={{ position: 'relative', flex: showBestSets ? '0 0 calc(80% - 12px)' : '1', minWidth: 0 }}>
+              <div className="progress-content-wrapper" style={{ display: 'flex', gap: 24, width: '100%' }}>
+                <div className="chart-container" style={{ position: 'relative', flex: showSideBox ? '0 0 calc(80% - 12px)' : '1', minWidth: 0 }}>
                   {!selectedExercise ? (
                     <div className="chart-empty">
                       <TrendingUp size={48} />
@@ -325,21 +328,45 @@ export default function ProgressPage() {
                   )}
                 </div>
                 {showBestSets && (
-                  <div style={{ flex: '0 0 calc(20% - 12px)', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24, minHeight: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 24, textTransform: 'uppercase' }}>Best Sets</div>
+                  <div style={{ flex: '0 0 calc(20% - 12px)', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: '24px 12px', minHeight: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 24, textTransform: 'uppercase', textAlign: 'center' }}>Best Sets</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%', alignItems: 'center' }}>
                       {chartData.filter(d => d?.bestSetVolume > 0).sort((a, b) => b.bestSetVolume - a.bestSetVolume).slice(0, 3).map((d, i, arr) => {
                         let dateLabel = d.date;
                         try {
                           const dateStr = d.date.includes('T') ? d.date : d.date + 'T00:00:00';
-                          dateLabel = format(new Date(dateStr), 'MMM d, yyyy');
+                          dateLabel = format(new Date(dateStr), 'MMM d, yy');
                         } catch(e) {}
                         return (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%' }}>
                           <div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: 4 }}>{dateLabel}</div>
-                            <div style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '1.2rem', marginBottom: 4 }}>{d.bestSetWeight || 0} kg × {d.bestSetReps || 0}</div>
-                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{Number(d.bestSetVolume).toLocaleString()} kg vol</div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: 4 }}>{dateLabel}</div>
+                            <div style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '1.05rem', marginBottom: 4 }}>{d.bestSetWeight || 0} kg × {d.bestSetReps || 0}</div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{Number(d.bestSetVolume).toLocaleString()} kg vol</div>
+                          </div>
+                          {i < arr.length - 1 && (
+                            <div style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.1)', marginTop: 20, width: '100%' }} />
+                          )}
+                        </div>
+                      )})}
+                    </div>
+                  </div>
+                )}
+                {showTopSets && (
+                  <div style={{ flex: '0 0 calc(20% - 12px)', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: '24px 12px', minHeight: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 24, textTransform: 'uppercase', textAlign: 'center' }}>Top Sets</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%', alignItems: 'center' }}>
+                      {chartData.filter(d => d?.maxWeight > 0).sort((a, b) => b.maxWeight - a.maxWeight).slice(0, 3).map((d, i, arr) => {
+                        let dateLabel = d.date;
+                        try {
+                          const dateStr = d.date.includes('T') ? d.date : d.date + 'T00:00:00';
+                          dateLabel = format(new Date(dateStr), 'MMM d, yy');
+                        } catch(e) {}
+                        return (
+                        <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%' }}>
+                          <div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: 4 }}>{dateLabel}</div>
+                            <div style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '1.05rem', marginBottom: 4 }}>{d.maxWeight || 0} kg × {d.maxWeightReps || 0}</div>
                           </div>
                           {i < arr.length - 1 && (
                             <div style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.1)', marginTop: 20, width: '100%' }} />
