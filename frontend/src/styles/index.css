@@ -1335,6 +1335,10 @@ textarea.input {
    EXERCISES PAGE
    ======================== */
 .exercises-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .exercises-header {
@@ -1391,7 +1395,10 @@ textarea.input {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
 }
 
 .exercises-table {
@@ -1404,6 +1411,10 @@ textarea.input {
 }
 
 .exercises-table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-elevated);
   padding: 12px 16px;
   font-size: 0.72rem;
   font-weight: 700;
