@@ -29,7 +29,7 @@ WORKDIR /app/backend
 RUN mvn dependency:go-offline -q
 
 # Now copy the rest of the backend source
-COPY backend/src/ ./backend/src/
+COPY backend/src/ ./src/
 
 # Build: downloads Node, builds React, compiles Java, packages fat JAR
 RUN mvn clean package -DskipTests
