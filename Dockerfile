@@ -39,7 +39,7 @@ RUN mvn clean package -DskipTests
 # Minimal JRE image — no Maven, no Node, no source code
 # The fat JAR contains the React bundle inside BOOT-INF/classes/static/
 # -----------------------------------------------------------------------------
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
