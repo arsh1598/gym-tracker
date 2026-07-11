@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { format } from 'date-fns'
-import { History, Save, Plus, ChevronDown, Trash2 } from 'lucide-react'
+import { History, Save, Plus, ChevronDown, Trash2, Calendar, Activity, X } from 'lucide-react'
 import CalendarPanel from '../components/CalendarPanel'
 import ExerciseCard from '../components/ExerciseCard'
 import { useToast } from '../components/ToastProvider'
@@ -186,6 +186,7 @@ export default function WorkoutsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [hasExistingWorkout, setHasExistingWorkout] = useState(false)
+  const [mobileModal, setMobileModal] = useState(null)
 
   const scrollableRef = useRef(null)
   const exercisesEndRef = useRef(null)
@@ -404,7 +405,31 @@ export default function WorkoutsPage() {
   return (
     <div className="page-container">
       <div className="workouts-layout">
-        <CalendarPanel selectedDate={selectedDate} onSelectDate={setSelectedDate} refreshKey={refreshKey} />
+        <div className="mobile-top-bar">
+          <button className="mobile-top-btn" onClick={() => setMobileModal('calendar')}>
+            <Calendar size={14} />
+            {format(selectedDate, 'MMM d, yyyy')}
+          </button>
+          <button className="mobile-top-btn" onClick={() => setMobileModal('summary')}>
+            <Activity size={14} />
+          </button>
+        </div>
+
+        <div 
+          className={`calendar-panel-wrapper ${mobileModal ? `show-modal show-${mobileModal}` : ''}`} 
+          onClick={() => setMobileModal(null)}
+        >
+          <div className="calendar-panel-inner" onClick={e => e.stopPropagation()}>
+            <CalendarPanel 
+              selectedDate={selectedDate} 
+              onSelectDate={(d) => {
+                setSelectedDate(d);
+                setMobileModal(null);
+              }} 
+              refreshKey={refreshKey} 
+            />
+          </div>
+        </div>
 
         <div className="workout-editor">
           {/* Fixed top: date + title + notes */}

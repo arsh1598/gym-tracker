@@ -1771,6 +1771,14 @@ input[type="date"] {
   color-scheme: dark;
 }
 
+/* Mobile Top Bar (Desktop Defaults) */
+.mobile-top-bar {
+  display: none;
+}
+.calendar-panel-wrapper {
+  display: block; 
+}
+
 /* ========================
    MOBILE RESPONSIVENESS
    ======================== */
@@ -1786,6 +1794,53 @@ input[type="date"] {
     grid-template-columns: 1fr;
     gap: 12px;
     overflow-y: visible; 
+  }
+
+  .mobile-top-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .mobile-top-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    padding: 8px 12px;
+    border-radius: 20px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  
+  .calendar-panel-wrapper {
+    display: none; 
+  }
+  
+  .calendar-panel-wrapper.show-modal {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .calendar-panel-inner {
+    width: 100%;
+    max-width: 360px;
+  }
+  
+  .calendar-panel-wrapper.show-calendar .summary-card {
+    display: none;
+  }
+  
+  .calendar-panel-wrapper.show-summary .calendar-card {
+    display: none;
   }
 
   /* Navbar to Bottom Tab Bar */
