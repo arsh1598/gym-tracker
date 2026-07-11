@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class ProgressDataPoint {
     private LocalDate date;
     private Double maxWeight;
+    private Integer maxWeightReps;
     private Double totalVolume;    // sum of weight * reps for all sets
     private Double bestSetVolume;  // best single set weight * reps
     private Double bestSetWeight;

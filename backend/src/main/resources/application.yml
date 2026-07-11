@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/gym_tracker}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/gym_tracker}
     username: ${DATABASE_USERNAME:gymuser}
     password: ${DATABASE_PASSWORD:gympassword}
     driver-class-name: org.postgresql.Driver

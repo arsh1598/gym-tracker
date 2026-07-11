@@ -96,10 +96,21 @@ public class ProgressService {
                     LocalDate date = entry.getKey();
                     List<ExerciseSet> daySets = entry.getValue();
 
-                    double maxWeight = daySets.stream()
-                            .filter(s -> s.getWeight() != null)
-                            .mapToDouble(ExerciseSet::getWeight)
-                            .max().orElse(0);
+                    double maxWeight = 0;
+                    int maxWeightReps = 0;
+                    for (ExerciseSet s : daySets) {
+                        if (s.getWeight() != null) {
+                            if (s.getWeight() > maxWeight) {
+                                maxWeight = s.getWeight();
+                                maxWeightReps = s.getReps() != null ? s.getReps() : 0;
+                            } else if (s.getWeight() == maxWeight) {
+                                int reps = s.getReps() != null ? s.getReps() : 0;
+                                if (reps > maxWeightReps) {
+                                    maxWeightReps = reps;
+                                }
+                            }
+                        }
+                    }
 
                     double totalVolume = daySets.stream()
                             .filter(s -> s.getWeight() != null && s.getReps() != null)
@@ -134,6 +145,7 @@ public class ProgressService {
                     return ProgressDataPoint.builder()
                             .date(date)
                             .maxWeight(maxWeight)
+                            .maxWeightReps(maxWeightReps)
                             .totalVolume(Math.round(totalVolume * 10.0) / 10.0)
                             .bestSetVolume(Math.round(bestSetVol * 10.0) / 10.0)
                             .bestSetWeight(bestSetWeight)
