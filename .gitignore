@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Java build output
+backend/target/
+*.class
+*.jar
+
+# IDE
+backend/.idea/
+*.iml
+.vscode/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
