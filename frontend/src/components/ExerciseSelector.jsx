@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Search, X, Plus } from 'lucide-react'
 import { getAllExercises, createExercise } from '../api/client'
-
-const MUSCLE_COLORS = {
-  Chest: '#8b5cf6', Back: '#3b82f6', Legs: '#f59e0b',
-  Shoulders: '#10b981', Biceps: '#22c55e', Triceps: '#f97316',
-  Core: '#06b6d4',
-}
+import { MUSCLE_COLORS } from '../utils/muscleColors'
 
 export default function ExerciseSelector({ onSelect, onClose }) {
   const [exercises, setExercises] = useState([])
@@ -78,7 +73,7 @@ export default function ExerciseSelector({ onSelect, onClose }) {
             <div key={ex.id} className="exercise-list-item" onClick={() => onSelect(ex)}>
               <div
                 className="muscle-dot"
-                style={{ background: MUSCLE_COLORS[ex.targetMuscle] || '#6b7280' }}
+                style={{ background: MUSCLE_COLORS[ex.targetMuscle] || MUSCLE_COLORS.Other }}
               />
               <span className="exercise-list-item-name">{ex.name}</span>
               <span className="exercise-list-item-muscle">{ex.targetMuscle}</span>

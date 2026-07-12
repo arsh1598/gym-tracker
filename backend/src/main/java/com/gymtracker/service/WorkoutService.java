@@ -100,9 +100,8 @@ public class WorkoutService {
      */
     @Transactional(readOnly = true)
     public List<WorkoutDto> getRecentWorkouts(int limit) {
-        return workoutRepository.findAllByOrderByDateDesc()
+        return workoutRepository.findAllByOrderByDateDesc(PageRequest.of(0, limit))
                 .stream()
-                .limit(limit)
                 .map(w -> WorkoutDto.builder()
                         .id(w.getId())
                         .date(w.getDate())

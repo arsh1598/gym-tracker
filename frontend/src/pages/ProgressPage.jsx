@@ -5,6 +5,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
 import { getAllExercises, getExerciseProgress, getMuscleVolumeProgress, getRecentlyLoggedExercises } from '../api/client'
+import { MUSCLE_COLORS } from '../utils/muscleColors'
 
 const METRICS = [
   { key: 'maxWeight', label: 'Max Weight' },
@@ -12,16 +13,6 @@ const METRICS = [
   { key: 'bestSetVolume', label: 'Best Set Vol.' },
   { key: 'estimatedOneRepMax', label: 'Est. 1RM' },
 ]
-
-const MUSCLE_COLORS = {
-  Legs: '#f97316',
-  Back: '#3b82f6',
-  Chest: '#06b6d4',
-  Shoulders: '#8b5cf6',
-  Triceps: '#d946ef',
-  Biceps: '#22c55e',
-  Other: '#64748b'
-}
 
 const CustomTooltip = ({ active, payload, label, metric }) => {
   if (!active || !payload?.length) return null

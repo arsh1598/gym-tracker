@@ -280,12 +280,12 @@ export default function WorkoutsPage() {
         oldPRs = await getAllPRs()
       } catch (err) {}
 
+      const allEx = await getAllExercises()
       const resolvedExercises = await Promise.all(
         exercises.map(async (we) => {
           if (we.exercise._isNew) {
             const name = we.exercise.name?.trim()
             if (!name) return null
-            const allEx = await getAllExercises()
             const existing = allEx.find(e => e.name.toLowerCase() === name.toLowerCase())
             const ex = existing || await createExercise({ name, targetMuscle: 'Other' })
             return { ...we, exercise: ex }

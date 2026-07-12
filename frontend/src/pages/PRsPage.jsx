@@ -2,15 +2,10 @@ import { useState, useEffect } from 'react'
 import { Trophy, Search, X } from 'lucide-react'
 import { format } from 'date-fns'
 import { getAllPRs, getAllExercises, getPRForExercise } from '../api/client'
-
-const MUSCLE_COLORS = {
-  Chest: '#8b5cf6', Back: '#3b82f6', Legs: '#f59e0b',
-  Shoulders: '#10b981', Biceps: '#22c55e', Triceps: '#f97316',
-  Core: '#06b6d4',
-}
+import { MUSCLE_COLORS } from '../utils/muscleColors'
 
 function PRCard({ pr, highlight = false }) {
-  const color = MUSCLE_COLORS[pr.targetMuscle] || '#8899bb'
+  const color = MUSCLE_COLORS[pr.targetMuscle] || MUSCLE_COLORS.Other
   return (
     <div className={`pr-card ${highlight ? 'pr-card-highlight' : ''}`}>
       <div className="pr-card-header">

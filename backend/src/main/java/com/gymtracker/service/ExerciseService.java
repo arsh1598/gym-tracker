@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +37,15 @@ public class ExerciseService {
 
     @Transactional
     public ExerciseDto createExercise(ExerciseDto dto) {
+        if (dto.getName() != null) {
+            String trimmedName = dto.getName().trim();
+            Optional<Exercise> existing = exerciseRepository.findByNameIgnoreCase(trimmedName);
+            if (existing.isPresent()) {
+                return toDto(existing.get());
+            }
+        }
         Exercise exercise = Exercise.builder()
-                .name(dto.getName())
+                .name(dto.getName() != null ? dto.getName().trim() : null)
                 .targetMuscle(dto.getTargetMuscle())
                 .build();
         return toDto(exerciseRepository.save(exercise));

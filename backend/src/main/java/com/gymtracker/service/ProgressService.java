@@ -165,15 +165,34 @@ public class ProgressService {
         List<Exercise> exercises = exerciseRepository.findAll();
         Map<String, List<ProgressDataPoint>> result = new LinkedHashMap<>();
 
-        for (Exercise ex : exercises) {
-            String muscle = ex.getTargetMuscle();
-            if (muscle == null || muscle.isBlank()) continue;
-            List<ProgressDataPoint> data = getProgressData(ex.getId(), startDate, endDate);
-            if (!data.isEmpty()) {
-                result.merge(muscle, data, (existing, newData) -> {
-                    existing.addAll(newData);
-                    return existing;
-                });
+        // Group exercises by target muscle to process them together
+        Map<String, List<Exercise>> exercisesByMuscle = exercises.stream()
+                .filter(ex -> ex.getTargetMuscle() != null && !ex.getTargetMuscle().isBlank())
+                .collect(Collectors.groupingBy(Exercise::getTargetMuscle));
+
+        for (Map.Entry<String, List<Exercise>> entry : exercisesByMuscle.entrySet()) {
+            String muscle = entry.getKey();
+            List<Exercise> muscleExercises = entry.getValue();
+
+            // Collect and sum volume by date for all exercises in this muscle group
+            Map<LocalDate, Double> volumeByDate = new TreeMap<>();
+            for (Exercise ex : muscleExercises) {
+                List<ProgressDataPoint> data = getProgressData(ex.getId(), startDate, endDate);
+                for (ProgressDataPoint pt : data) {
+                    volumeByDate.merge(pt.getDate(), pt.getTotalVolume(), Double::sum);
+                }
+            }
+
+            // Map back to a list of sorted aggregated ProgressDataPoints
+            List<ProgressDataPoint> aggregatedPoints = volumeByDate.entrySet().stream()
+                    .map(e -> ProgressDataPoint.builder()
+                            .date(e.getKey())
+                            .totalVolume(Math.round(e.getValue() * 10.0) / 10.0)
+                            .build())
+                    .collect(Collectors.toList());
+
+            if (!aggregatedPoints.isEmpty()) {
+                result.put(muscle, aggregatedPoints);
             }
         }
 
