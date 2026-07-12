@@ -16,7 +16,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${VITE_SUPABASE_URL}/auth/v1/jwks
+          jwk-set-uri: ${VITE_SUPABASE_URL}/auth/v1/.well-known/jwks.json
 
 server:
   port: ${PORT:8080}
