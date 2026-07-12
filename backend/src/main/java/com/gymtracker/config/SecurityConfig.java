@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -52,8 +53,10 @@ public class SecurityConfig {
                     .macAlgorithm(MacAlgorithm.HS256)
                     .build();
         } else if (jwkSetUri != null && !jwkSetUri.trim().isEmpty()) {
-            // Support asymmetric (RS256/ES256) signing via JWKS
-            return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+            // Support asymmetric ES256 signing via JWKS
+            return NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                    .jwsAlgorithm(SignatureAlgorithm.ES256)
+                    .build();
         } else {
             throw new IllegalStateException("Either SUPABASE_JWT_SECRET environment variable or spring.security.oauth2.resourceserver.jwt.jwk-set-uri must be configured");
         }
