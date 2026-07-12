@@ -19,19 +19,19 @@ public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
 
     public List<ExerciseDto> getAllExercises() {
-        return exerciseRepository.findByUserId(SecurityUtils.getCurrentUserId()).stream()
+        return exerciseRepository.findAllByUserIdOrSystem(SecurityUtils.getCurrentUserId()).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     public List<ExerciseDto> searchExercises(String query) {
-        return exerciseRepository.findByUserIdAndNameContainingIgnoreCase(SecurityUtils.getCurrentUserId(), query).stream()
+        return exerciseRepository.searchByUserIdOrSystem(SecurityUtils.getCurrentUserId(), query).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     public List<ExerciseDto> getByMuscle(String muscle) {
-        return exerciseRepository.findByUserIdAndTargetMuscleIgnoreCase(SecurityUtils.getCurrentUserId(), muscle).stream()
+        return exerciseRepository.findByMuscleAndUserIdOrSystem(SecurityUtils.getCurrentUserId(), muscle).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -41,7 +41,7 @@ public class ExerciseService {
         String userId = SecurityUtils.getCurrentUserId();
         if (dto.getName() != null) {
             String trimmedName = dto.getName().trim();
-            Optional<Exercise> existing = exerciseRepository.findByUserIdAndNameIgnoreCase(userId, trimmedName);
+            Optional<Exercise> existing = exerciseRepository.findExactByUserIdOrSystem(userId, trimmedName);
             if (existing.isPresent()) {
                 return toDto(existing.get());
             }

@@ -68,7 +68,7 @@ public class ProgressService {
      */
     @Transactional(readOnly = true)
     public List<PRDto> getAllPRs() {
-        List<Exercise> exercises = exerciseRepository.findByUserId(SecurityUtils.getCurrentUserId());
+        List<Exercise> exercises = exerciseRepository.findAllByUserIdOrSystem(SecurityUtils.getCurrentUserId());
         List<PRDto> prs = new ArrayList<>();
 
         for (Exercise ex : exercises) {
@@ -163,7 +163,7 @@ public class ProgressService {
      */
     @Transactional(readOnly = true)
     public Map<String, List<ProgressDataPoint>> getMuscleVolumeProgress(LocalDate startDate, LocalDate endDate) {
-        List<Exercise> exercises = exerciseRepository.findByUserId(SecurityUtils.getCurrentUserId());
+        List<Exercise> exercises = exerciseRepository.findAllByUserIdOrSystem(SecurityUtils.getCurrentUserId());
         Map<String, List<ProgressDataPoint>> result = new LinkedHashMap<>();
 
         // Group exercises by target muscle to process them together
