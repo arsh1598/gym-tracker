@@ -12,6 +12,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${VITE_SUPABASE_URL}/auth/v1/jwks
 
 server:
   port: ${PORT:8080}
@@ -21,8 +26,4 @@ logging:
     com.gymtracker: INFO
     org.hibernate.SQL: WARN
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${VITE_SUPABASE_URL}/auth/v1/jwks
+
