@@ -22,6 +22,5 @@ logging:
     org.hibernate.SQL: WARN
 
 supabase:
-  url: ${SUPABASE_URL}
   jwt:
     secret: ${SUPABASE_JWT_SECRET}
