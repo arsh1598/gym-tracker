@@ -5,6 +5,7 @@ import { useToast } from './ToastProvider'
 
 export default function AuthModal() {
   const [isLogin, setIsLogin] = useState(true)
+  const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,37 +17,37 @@ export default function AuthModal() {
     setLoading(true)
     
     try {
-      // Supabase requires an email, so we append a dummy domain to the username
-      const dummyEmail = `${username.toLowerCase().trim()}@gymtracker.app`
-      
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          email: dummyEmail,
+          email,
           password
         })
         if (error) {
           if (error.message.includes('Invalid login credentials')) {
-             throw new Error('Incorrect username or password.')
+             throw new Error('Incorrect email or password.')
+          }
+          if (error.message.includes('Email not confirmed')) {
+             throw new Error('Please check your email and confirm your account before logging in.')
           }
           throw error
         }
       } else {
         const { error } = await supabase.auth.signUp({
-          email: dummyEmail,
+          email,
           password,
           options: {
             data: {
-              username: username.trim()
+              username: username.trim() || email.split('@')[0]
             }
           }
         })
         if (error) {
           if (error.message.includes('User already registered')) {
-            throw new Error('This username is already taken. Please choose another or sign in.')
+            throw new Error('This email is already taken. Please sign in.')
           }
           throw error
         }
-        toast('Registration successful! You are now logged in.', 'success')
+        toast('Registration successful! Please check your email to confirm your account.', 'success')
       }
     } catch (error) {
       toast(error.message, 'error')
@@ -79,14 +80,28 @@ export default function AuthModal() {
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {!isLogin && (
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Username</label>
+              <input 
+                type="text" 
+                className="input" 
+                placeholder="How should we call you?"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                required={!isLogin}
+              />
+            </div>
+          )}
+
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Username</label>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Email</label>
             <input 
-              type="text" 
+              type="email" 
               className="input" 
-              placeholder="e.g. gymbro99"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               required
             />
           </div>
