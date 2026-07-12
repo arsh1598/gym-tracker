@@ -31,6 +31,14 @@ RUN mvn dependency:go-offline -q
 # Now copy the rest of the backend source
 COPY backend/src/ ./src/
 
+# 1. Declare the build arguments Render provides
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+
+# 2. Map them to environment variables so the spawned Node process inherits them
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+
 # Build: downloads Node, builds React, compiles Java, packages fat JAR
 RUN mvn clean package -DskipTests
 
