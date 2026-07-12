@@ -21,6 +21,8 @@ logging:
     com.gymtracker: INFO
     org.hibernate.SQL: WARN
 
-supabase:
-  jwt:
-    secret: ${SUPABASE_JWT_SECRET}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${VITE_SUPABASE_URL}/auth/v1/jwks
