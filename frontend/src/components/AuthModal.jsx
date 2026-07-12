@@ -34,10 +34,10 @@ export default function AuthModal() {
           }
         })
         if (error) throw error
-        toast.show('Registration successful! You are now logged in.', 'success')
+        toast('Registration successful! You are now logged in.', 'success')
       }
     } catch (error) {
-      toast.show(error.message, 'error')
+      toast(error.message, 'error')
     } finally {
       setLoading(false)
     }
