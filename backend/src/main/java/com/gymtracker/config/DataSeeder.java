@@ -87,10 +87,11 @@ public class DataSeeder implements CommandLineRunner {
                 Exercise.builder().name("Hanging Leg Raise").targetMuscle("Core").build()
         );
 
-        // Idempotent: only insert exercises that don't already exist by name
+        // Idempotent: only insert exercises that don't already exist by name for system
         int seeded = 0;
         for (Exercise candidate : candidates) {
-            if (!exerciseRepository.existsByNameIgnoreCase(candidate.getName())) {
+            candidate.setUserId("system");
+            if (!exerciseRepository.existsByUserIdAndNameIgnoreCase("system", candidate.getName())) {
                 exerciseRepository.save(candidate);
                 seeded++;
             }

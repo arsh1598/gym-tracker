@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { useState } from 'react'
 import Navbar from './components/Navbar'
 import { ToastProvider } from './components/ToastProvider'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import AuthModal from './components/AuthModal'
 import WorkoutsPage from './pages/WorkoutsPage'
 import ProgressPage from './pages/ProgressPage'
 import PRsPage from './pages/PRsPage'
@@ -55,23 +57,38 @@ const SwipeableRoutes = ({ children }) => {
   );
 };
 
+const AppContent = () => {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', overflowX: 'hidden' }}>
+      {!user && <AuthModal />}
+      <Navbar />
+      <SwipeableRoutes>
+        <Routes>
+          <Route path="/" element={<Navigate to="/workouts" replace />} />
+          <Route path="/workouts" element={<WorkoutsPage />} />
+          <Route path="/progress" element={<ProgressPage />} />
+          <Route path="/prs" element={<PRsPage />} />
+          <Route path="/exercises" element={<ExercisesPage />} />
+        </Routes>
+      </SwipeableRoutes>
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <ToastProvider>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', overflowX: 'hidden' }}>
-          <Navbar />
-          <SwipeableRoutes>
-            <Routes>
-              <Route path="/" element={<Navigate to="/workouts" replace />} />
-              <Route path="/workouts" element={<WorkoutsPage />} />
-              <Route path="/progress" element={<ProgressPage />} />
-              <Route path="/prs" element={<PRsPage />} />
-              <Route path="/exercises" element={<ExercisesPage />} />
-            </Routes>
-          </SwipeableRoutes>
-        </div>
-      </ToastProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <AppContent />
+        </ToastProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

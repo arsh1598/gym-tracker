@@ -1,7 +1,15 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Dumbbell, TrendingUp, Trophy, ListChecks, LogOut } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { supabase } from '../supabaseClient'
 
-export default function Navbar({ username = 'local' }) {
+export default function Navbar() {
+  const { user } = useAuth()
+  const username = user?.user_metadata?.username || user?.email || 'local'
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+  }
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -32,7 +40,7 @@ export default function Navbar({ username = 'local' }) {
 
       <div className="navbar-right">
         <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>{username}</span>
-        <button className="btn btn-ghost btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <button onClick={handleSignOut} className="btn btn-ghost btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <LogOut size={14} />
           Sign out
         </button>

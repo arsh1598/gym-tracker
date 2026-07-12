@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
+import com.gymtracker.util.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class WorkoutService {
      */
     @Transactional(readOnly = true)
     public Optional<WorkoutDto> getWorkoutByDate(LocalDate date) {
-        return workoutRepository.findByDate(date).map(this::toDto);
+        return workoutRepository.findByDateAndUserId(date, SecurityUtils.getCurrentUserId()).map(this::toDto);
     }
 
     /**
@@ -36,9 +37,11 @@ public class WorkoutService {
      */
     @Transactional
     public WorkoutDto saveWorkout(WorkoutRequest.SaveWorkout request) {
+        String userId = SecurityUtils.getCurrentUserId();
         // Find existing or create new
-        Workout workout = workoutRepository.findByDate(request.getDate())
+        Workout workout = workoutRepository.findByDateAndUserId(request.getDate(), userId)
                 .orElse(Workout.builder()
+                        .userId(userId)
                         .date(request.getDate())
                         .workoutExercises(new ArrayList<>())
                         .build());
@@ -51,7 +54,7 @@ public class WorkoutService {
 
         if (request.getWorkoutExercises() != null) {
             for (WorkoutRequest.WorkoutExerciseRequest weReq : request.getWorkoutExercises()) {
-                Exercise exercise = exerciseRepository.findById(weReq.getExerciseId())
+                Exercise exercise = exerciseRepository.findByIdAndUserId(weReq.getExerciseId(), userId)
                         .orElseThrow(() -> new RuntimeException("Exercise not found: " + weReq.getExerciseId()));
 
                 WorkoutExercise we = WorkoutExercise.builder()
@@ -89,7 +92,7 @@ public class WorkoutService {
      */
     @Transactional(readOnly = true)
     public List<LocalDate> getWorkoutDatesForMonth(int year, int month) {
-        return workoutRepository.findByYearAndMonth(year, month)
+        return workoutRepository.findByUserIdAndYearAndMonth(SecurityUtils.getCurrentUserId(), year, month)
                 .stream()
                 .map(Workout::getDate)
                 .collect(Collectors.toList());
@@ -100,7 +103,7 @@ public class WorkoutService {
      */
     @Transactional(readOnly = true)
     public List<WorkoutDto> getRecentWorkouts(int limit) {
-        return workoutRepository.findAllByOrderByDateDesc(PageRequest.of(0, limit))
+        return workoutRepository.findAllByUserIdOrderByDateDesc(SecurityUtils.getCurrentUserId(), PageRequest.of(0, limit))
                 .stream()
                 .map(w -> WorkoutDto.builder()
                         .id(w.getId())
@@ -140,7 +143,7 @@ public class WorkoutService {
      */
     @Transactional(readOnly = true)
     public Optional<WorkoutDto> getWorkoutById(Long id) {
-        return workoutRepository.findById(id).map(this::toDto);
+        return workoutRepository.findByIdAndUserId(id, SecurityUtils.getCurrentUserId()).map(this::toDto);
     }
 
     /**
@@ -163,7 +166,7 @@ public class WorkoutService {
     public MonthlySummaryDto getMonthlySummary(int year, int month) {
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
-        long count = workoutRepository.countByDateBetween(start, end);
+        long count = workoutRepository.countByUserIdAndDateBetween(SecurityUtils.getCurrentUserId(), start, end);
         int daysInMonth = start.lengthOfMonth();
         double consistency = (double) count / daysInMonth * 100;
         return new MonthlySummaryDto(count, Math.round(consistency));
@@ -174,7 +177,7 @@ public class WorkoutService {
      */
     @Transactional
     public void deleteWorkoutByDate(LocalDate date) {
-        workoutRepository.findByDate(date).ifPresent(workoutRepository::delete);
+        workoutRepository.findByDateAndUserId(date, SecurityUtils.getCurrentUserId()).ifPresent(workoutRepository::delete);
     }
 
     // ---- Mappers ----

@@ -9,8 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
-    List<Exercise> findByNameContainingIgnoreCase(String name);
-    List<Exercise> findByTargetMuscleIgnoreCase(String targetMuscle);
-    boolean existsByNameIgnoreCase(String name);
-    Optional<Exercise> findByNameIgnoreCase(String name);
+    Optional<Exercise> findByIdAndUserId(Long id, String userId);
+    List<Exercise> findByUserId(String userId);
+    List<Exercise> findByUserIdAndNameContainingIgnoreCase(String userId, String name);
+    List<Exercise> findByUserIdAndTargetMuscleIgnoreCase(String userId, String targetMuscle);
+    Optional<Exercise> findByUserIdAndNameIgnoreCase(String userId, String name);
+    boolean existsByUserIdAndNameIgnoreCase(String userId, String name);
 }

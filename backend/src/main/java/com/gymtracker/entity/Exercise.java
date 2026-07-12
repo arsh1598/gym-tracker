@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "exercises")
+@Table(name = "exercises", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "name"})
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,7 +23,10 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false)
+    private String userId;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(name = "target_muscle")

@@ -13,16 +13,14 @@ import java.util.Optional;
 
 @Repository
 public interface WorkoutRepository extends JpaRepository<Workout, Long> {
-    Optional<Workout> findByDate(LocalDate date);
-    List<Workout> findByDateBetweenOrderByDateDesc(LocalDate start, LocalDate end);
-    List<Workout> findAllByOrderByDateDesc();
-    List<Workout> findAllByOrderByDateDesc(Pageable pageable);
+    Optional<Workout> findByIdAndUserId(Long id, String userId);
+    Optional<Workout> findByDateAndUserId(LocalDate date, String userId);
+    List<Workout> findAllByUserIdOrderByDateDesc(String userId);
+    List<Workout> findAllByUserIdOrderByDateDesc(String userId, Pageable pageable);
 
-    @Query("SELECT COUNT(w) FROM Workout w WHERE w.date BETWEEN :start AND :end")
-    long countByDateBetween(@Param("start") LocalDate start, @Param("end") LocalDate end);
+    @Query("SELECT COUNT(w) FROM Workout w WHERE w.userId = :userId AND w.date BETWEEN :start AND :end")
+    long countByUserIdAndDateBetween(@Param("userId") String userId, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
-    @Query("SELECT w FROM Workout w WHERE YEAR(w.date) = :year AND MONTH(w.date) = :month ORDER BY w.date DESC")
-    List<Workout> findByYearAndMonth(@Param("year") int year, @Param("month") int month);
-
-    List<Workout> findTop5ByOrderByDateDesc();
+    @Query("SELECT w FROM Workout w WHERE w.userId = :userId AND YEAR(w.date) = :year AND MONTH(w.date) = :month ORDER BY w.date DESC")
+    List<Workout> findByUserIdAndYearAndMonth(@Param("userId") String userId, @Param("year") int year, @Param("month") int month);
 }
