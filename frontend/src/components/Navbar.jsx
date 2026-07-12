@@ -13,19 +13,19 @@ export default function Navbar({ username = 'local' }) {
 
       <div className="navbar-nav">
         <NavLink to="/workouts" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <Dumbbell size={15} />
+          <Dumbbell size={20} />
           Workouts
         </NavLink>
         <NavLink to="/progress" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <TrendingUp size={15} />
+          <TrendingUp size={20} />
           Progress
         </NavLink>
         <NavLink to="/prs" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <Trophy size={15} />
+          <Trophy size={20} />
           PRs
         </NavLink>
         <NavLink to="/exercises" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <ListChecks size={15} />
+          <ListChecks size={20} />
           Exercises
         </NavLink>
       </div>

@@ -177,14 +177,14 @@ export default function ProgressPage() {
             <button
               className={`btn btn-sm ${viewMode === 'exercise' ? 'btn-primary' : 'btn-ghost'}`}
               onClick={() => setViewMode('exercise')}
-              style={{ padding: '6px 12px' }}
+              style={{ padding: '6px 8px', whiteSpace: 'nowrap', fontSize: '0.8rem' }}
             >
               <TrendingUp size={14} /> Exercise
             </button>
             <button
               className={`btn btn-sm ${viewMode === 'volume' ? 'btn-primary' : 'btn-ghost'}`}
               onClick={() => setViewMode('volume')}
-              style={{ padding: '6px 12px' }}
+              style={{ padding: '6px 8px', whiteSpace: 'nowrap', fontSize: '0.8rem' }}
             >
               <BarChart2 size={14} /> Muscle Volume
             </button>

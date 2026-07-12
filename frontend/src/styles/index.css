@@ -1100,7 +1100,7 @@ textarea.input {
 
 .control-group {
   flex: 1;
-  min-width: 160px;
+  min-width: calc(50% - 8px);
 }
 
 .control-label {
@@ -1113,9 +1113,9 @@ textarea.input {
 }
 
 .metric-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
 .metric-tab {

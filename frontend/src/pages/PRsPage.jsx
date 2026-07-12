@@ -105,7 +105,7 @@ export default function PRsPage() {
               <Search size={15} className="search-icon" />
               <input
                 className="input"
-                placeholder="Search a lift — e.g. Bench Press, Deadlift..."
+                placeholder="Search a lift — e.g. Bench Press..."
                 value={searchQuery}
                 onChange={e => {
                   setSearchQuery(e.target.value)
