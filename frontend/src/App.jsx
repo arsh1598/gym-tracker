@@ -66,17 +66,22 @@ const AppContent = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', overflowX: 'hidden' }}>
-      {!user && <AuthModal />}
-      <Navbar />
-      <SwipeableRoutes>
-        <Routes>
-          <Route path="/" element={<Navigate to="/workouts" replace />} />
-          <Route path="/workouts" element={<WorkoutsPage />} />
-          <Route path="/progress" element={<ProgressPage />} />
-          <Route path="/prs" element={<PRsPage />} />
-          <Route path="/exercises" element={<ExercisesPage />} />
-        </Routes>
-      </SwipeableRoutes>
+      {!user ? (
+        <AuthModal />
+      ) : (
+        <>
+          <Navbar />
+          <SwipeableRoutes>
+            <Routes>
+              <Route path="/" element={<Navigate to="/workouts" replace />} />
+              <Route path="/workouts" element={<WorkoutsPage />} />
+              <Route path="/progress" element={<ProgressPage />} />
+              <Route path="/prs" element={<PRsPage />} />
+              <Route path="/exercises" element={<ExercisesPage />} />
+            </Routes>
+          </SwipeableRoutes>
+        </>
+      )}
     </div>
   )
 }
