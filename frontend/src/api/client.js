@@ -9,17 +9,17 @@ const api = axios.create({
 api.interceptors.request.use(async (config) => {
   try {
     const { data: { session } } = await supabase.auth.getSession()
+    
     if (session?.access_token) {
-      if (typeof config.headers.set === 'function') {
-        config.headers.set('Authorization', `Bearer ${session.access_token}`)
-      } else {
-        config.headers.Authorization = `Bearer ${session.access_token}`
-      }
+      // Safest and most universally supported way to inject the token
+      config.headers['Authorization'] = `Bearer ${session.access_token}`
     }
   } catch (err) {
-    // ignore
+    console.error("Error attaching auth token:", err)
   }
   return config
+}, (error) => {
+  return Promise.reject(error)
 })
 
 
