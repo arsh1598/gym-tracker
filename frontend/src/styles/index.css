@@ -1100,7 +1100,7 @@ textarea.input {
 
 .control-group {
   flex: 1;
-  min-width: calc(50% - 8px);
+  min-width: 160px;
 }
 
 .control-label {
@@ -1890,6 +1890,15 @@ input[type="date"] {
   }
 
   /* Progress Page Layout */
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .control-group {
+    width: 100%;
+    min-width: 0;
+  }
+
   .progress-content-wrapper {
     flex-direction: column;
   }
