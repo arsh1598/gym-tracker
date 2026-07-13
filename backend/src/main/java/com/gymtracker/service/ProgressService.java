@@ -1,6 +1,7 @@
 package com.gymtracker.service;
 
 import com.gymtracker.dto.PRDto;
+import com.gymtracker.dto.PRProjection;
 import com.gymtracker.dto.ProgressDataPoint;
 import com.gymtracker.entity.Exercise;
 import com.gymtracker.entity.ExerciseSet;
@@ -69,16 +70,28 @@ public class ProgressService {
      */
     @Transactional(readOnly = true)
     public List<PRDto> getAllPRs() {
-        List<Exercise> exercises = exerciseRepository.findAllByUserIdOrSystem(SecurityUtils.getCurrentUserId());
-        List<PRDto> prs = new ArrayList<>();
+        String userId = SecurityUtils.getCurrentUserId();
+        List<PRProjection> projections = exerciseRepository.findPRsByUserId(userId);
 
-        for (Exercise ex : exercises) {
-            getPRForExercise(ex.getId()).ifPresent(prs::add);
-        }
-
-        // Sort by most recently set
-        prs.sort(Comparator.comparing(PRDto::getDateSet, Comparator.nullsLast(Comparator.reverseOrder())));
-        return prs;
+        return projections.stream()
+                .map(p -> {
+                    double e1rm = 0;
+                    if (p.getMaxWeight() != null && p.getRepsAtMaxWeight() != null) {
+                        e1rm = p.getMaxWeight() * (1 + p.getRepsAtMaxWeight() / 30.0);
+                    }
+                    return PRDto.builder()
+                            .exerciseId(p.getExerciseId())
+                            .exerciseName(p.getExerciseName())
+                            .targetMuscle(p.getTargetMuscle())
+                            .maxWeight(p.getMaxWeight())
+                            .repsAtMaxWeight(p.getRepsAtMaxWeight())
+                            .dateSet(p.getDateSet())
+                            .lastDoneDate(p.getLastDoneDate())
+                            .estimatedOneRepMax(Math.round(e1rm * 10.0) / 10.0)
+                            .build();
+                })
+                .sorted(Comparator.comparing(PRDto::getDateSet, Comparator.nullsLast(Comparator.reverseOrder())))
+                .collect(Collectors.toList());
     }
 
     /**
