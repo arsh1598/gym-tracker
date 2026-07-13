@@ -54,7 +54,7 @@ public class WorkoutService {
 
         if (request.getWorkoutExercises() != null) {
             for (WorkoutRequest.WorkoutExerciseRequest weReq : request.getWorkoutExercises()) {
-                Exercise exercise = exerciseRepository.findByIdAndUserId(weReq.getExerciseId(), userId)
+                Exercise exercise = exerciseRepository.findByIdAndUserIdOrSystem(weReq.getExerciseId(), userId)
                         .orElseThrow(() -> new RuntimeException("Exercise not found: " + weReq.getExerciseId()));
 
                 WorkoutExercise we = WorkoutExercise.builder()

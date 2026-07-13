@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     Optional<Exercise> findByIdAndUserId(Long id, String userId);
 
+    @Query("SELECT e FROM Exercise e WHERE e.id = :id AND (e.userId = :userId OR e.userId IS NULL)")
+    Optional<Exercise> findByIdAndUserIdOrSystem(@org.springframework.data.repository.query.Param("id") Long id, @org.springframework.data.repository.query.Param("userId") String userId);
+
     @Query("SELECT e FROM Exercise e WHERE e.userId = :userId OR e.userId IS NULL")
     List<Exercise> findAllByUserIdOrSystem(@org.springframework.data.repository.query.Param("userId") String userId);
 

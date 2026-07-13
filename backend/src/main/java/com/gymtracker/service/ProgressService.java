@@ -29,10 +29,11 @@ public class ProgressService {
      */
     @Transactional(readOnly = true)
     public Optional<PRDto> getPRForExercise(Long exerciseId) {
-        Exercise exercise = exerciseRepository.findByIdAndUserId(exerciseId, SecurityUtils.getCurrentUserId()).orElse(null);
+        String userId = SecurityUtils.getCurrentUserId();
+        Exercise exercise = exerciseRepository.findByIdAndUserIdOrSystem(exerciseId, userId).orElse(null);
         if (exercise == null) return Optional.empty();
 
-        List<ExerciseSet> sets = exerciseSetRepository.findAllByExerciseIdOrderByWeightDesc(exerciseId);
+        List<ExerciseSet> sets = exerciseSetRepository.findAllByExerciseIdAndUserIdOrderByWeightDesc(exerciseId, userId);
         if (sets.isEmpty()) return Optional.empty();
 
         ExerciseSet bestSet = sets.get(0);
@@ -85,7 +86,8 @@ public class ProgressService {
      */
     @Transactional(readOnly = true)
     public List<ProgressDataPoint> getProgressData(Long exerciseId, LocalDate startDate, LocalDate endDate) {
-        List<ExerciseSet> sets = exerciseSetRepository.findByExerciseAndDateRange(exerciseId, startDate, endDate);
+        String userId = SecurityUtils.getCurrentUserId();
+        List<ExerciseSet> sets = exerciseSetRepository.findByExerciseIdAndUserIdAndDateRange(exerciseId, userId, startDate, endDate);
 
         // Group sets by workout date
         Map<LocalDate, List<ExerciseSet>> byDate = sets.stream()
