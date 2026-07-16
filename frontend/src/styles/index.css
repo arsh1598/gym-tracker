@@ -1769,6 +1769,16 @@ textarea.input {
 /* Date input style */
 input[type="date"] {
   color-scheme: dark;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+}
+
+/* Reset default margins and padding inside webkit date value container for iOS Safari */
+input[type="date"]::-webkit-date-and-time-value {
+  margin: 0;
+  padding: 0;
+  min-height: 1.2em;
 }
 
 /* Mobile Top Bar (Desktop Defaults) */
