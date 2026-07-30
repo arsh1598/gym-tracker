@@ -701,10 +701,10 @@ textarea.input {
   padding: 0 16px 16px;
 }
 
-/* set-row grid: [#] [weight] [reps] [rpe] [DS] [↑↓🗑] */
+/* set-row grid: [#] [weight] [reps] [rpe] [↑↓🗑] */
 .sets-table-header {
   display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 36px 84px;
+  grid-template-columns: 24px 1fr 1fr 1fr 72px;
   gap: 6px;
   align-items: center;
   padding: 0 0 6px;
@@ -715,34 +715,57 @@ textarea.input {
   letter-spacing: 0.04em;
 }
 
-.set-row {
-  display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 36px 84px;
-  gap: 6px;
-  align-items: center;
+/* Swipe-to-DS / swipe-to-delete wrapper */
+.set-row-wrapper {
+  position: relative;
   margin-bottom: 7px;
   border-radius: 8px;
+  overflow: hidden;
+}
+
+.swipe-reveal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  transition: opacity 60ms linear;
+}
+.swipe-reveal-left {
+  left: 0;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.25), transparent);
+  color: #34d399;
+}
+.swipe-reveal-right {
+  right: 0;
+  background: linear-gradient(270deg, rgba(239, 68, 68, 0.25), transparent);
+  color: #f87171;
+}
+
+.set-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr 1fr 72px;
+  gap: 6px;
+  align-items: center;
+  border-radius: 8px;
   padding: 2px 4px;
+  background: var(--bg-elevated);
   transition: background var(--transition-fast);
+  position: relative;
+  z-index: 1;
 }
 /* DS active → full row red tint */
 .set-row.set-row-dropset {
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.18);
 }
-/* Hide DS badge + arrows by default, show on row hover */
-.set-row .ds-badge.inactive {
-  opacity: 0;
-  pointer-events: none;
-}
-.set-row:hover .ds-badge.inactive {
-  opacity: 1;
-  pointer-events: auto;
-}
-.set-row .ds-badge.active {
-  opacity: 1;
-  pointer-events: auto;
-}
+/* Hide arrows by default, show on row hover */
 .set-row .set-actions .move-btn {
   opacity: 0;
   pointer-events: none;
@@ -767,36 +790,43 @@ textarea.input {
   justify-content: flex-end;
 }
 
-.ds-badge {
-  font-size: 0.62rem;
-  font-weight: 800;
-  padding: 3px 6px;
-  border-radius: 5px;
-  cursor: pointer;
-  letter-spacing: 0.03em;
-  border: 1.5px solid;
-  transition: all var(--transition-fast);
-  width: 100%;
-  text-align: center;
-  display: block;
-  line-height: 1.2;
-}
-.ds-badge.active {
-  background: rgba(239, 68, 68, 0.18);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.45);
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.15);
-}
-.ds-badge.inactive {
-  background: rgba(255, 255, 255, 0.04);
+/* ── Drag-to-reorder handle & states ─────────────────────────────────────── */
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px 4px 2px;
   color: var(--text-muted);
-  border-color: rgba(255, 255, 255, 0.1);
+  cursor: grab;
+  opacity: 0.4;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
 }
-.ds-badge:hover {
-  transform: scale(1.08);
+.drag-handle:hover {
+  opacity: 1;
+  color: var(--text-accent);
+}
+.drag-handle:active {
+  cursor: grabbing;
 }
 
+.exercise-card.is-dragging {
+  opacity: 0.45;
+  border-color: var(--purple-light) !important;
+}
+.exercise-card.is-drag-over {
+  border-color: var(--purple-primary) !important;
+  box-shadow: 0 0 0 2px var(--purple-glow), 0 0 16px var(--purple-glow);
+}
 
+/* Mobile: class set directly on DOM element by touch drag handler */
+[data-exercise-index].drag-over {
+  border-color: var(--purple-primary) !important;
+  box-shadow: 0 0 0 2px var(--purple-glow), 0 0 16px var(--purple-glow);
+}
+[data-exercise-index].is-dragging {
+  opacity: 0.45;
+}
 
 .set-row input[type="number"]::-webkit-outer-spin-button,
 .set-row input[type="number"]::-webkit-inner-spin-button {

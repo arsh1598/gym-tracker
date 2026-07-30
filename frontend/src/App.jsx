@@ -1,5 +1,5 @@
+import React, { useRef } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import Navbar from './components/Navbar'
 import { ToastProvider } from './components/ToastProvider'
 import { AuthProvider, useAuth } from './context/AuthContext'
@@ -12,46 +12,46 @@ import ExercisesPage from './pages/ExercisesPage'
 const SwipeableRoutes = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const touchStartRef = useRef(null);
 
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 60;
 
   const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    const touch = e.targetTouches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
   };
 
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
+  const onTouchEnd = (e) => {
+    if (!touchStartRef.current) return;
 
-  const onTouchEndEvent = (e) => {
-    if (!touchStart || !touchEnd) return;
-    
     // Ignore swipes if target is inside a horizontally scrollable area (like a chart or table)
     if (e.target.closest('.recharts-wrapper') || e.target.closest('.sets-table') || e.target.closest('.workout-editor-scrollable')) {
+      touchStartRef.current = null;
       return;
     }
 
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    // Only count as a horizontal swipe if X movement dominates and exceeds threshold
+    if (Math.abs(deltaX) < minSwipeDistance) return;
+    if (Math.abs(deltaY) > Math.abs(deltaX) * 0.6) return;
 
     const routes = ['/workouts', '/progress', '/prs', '/exercises'];
-    // Exact match for the route or startswith
     const currentIndex = routes.findIndex(route => location.pathname.startsWith(route));
     if (currentIndex === -1) return;
 
-    if (isLeftSwipe && currentIndex < routes.length - 1) {
+    if (deltaX < 0 && currentIndex < routes.length - 1) {
       navigate(routes[currentIndex + 1]);
-    } else if (isRightSwipe && currentIndex > 0) {
+    } else if (deltaX > 0 && currentIndex > 0) {
       navigate(routes[currentIndex - 1]);
     }
   };
 
   return (
-    <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEndEvent} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       {children}
     </div>
   );

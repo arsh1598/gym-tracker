@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Trash2, Copy, ChevronUp, ChevronDown } from "lucide-react";
+import { Trash2, Copy, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
 import { getAllExercises, getLastSets } from "../api/client";
 
 // ── Exercise name autocomplete ────────────────────────────────────────────────
@@ -35,7 +35,6 @@ function ExerciseNameInput({ value, onChange, onSelectExercise }) {
   const handleSelect = async (ex) => {
     setShowDropdown(false);
     onChange(ex.name);
-    // Prefill last sets for this exercise
     try {
       const lastWE = await getLastSets(ex.id);
       if (lastWE && lastWE.sets && lastWE.sets.length > 0) {
@@ -86,86 +85,160 @@ function ExerciseNameInput({ value, onChange, onSelectExercise }) {
   );
 }
 
-// ── Set row ───────────────────────────────────────────────────────────────────
+// ── Set row with swipe-to-DS (right) / swipe-to-delete (left) ────────────────
 function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp, onMoveDown }) {
+  const [offsetX, setOffsetX] = useState(0);
+  const touchRef = useRef(null);      // { x, y } at touchstart
+  const swipingRef = useRef(false);   // true once committed to horizontal swipe
+  // We need to read offsetX inside handleTouchEnd without stale closure
+  const offsetXRef = useRef(0);
+
   const handleChange = (field, value) => {
     onUpdate(index, { ...setData, [field]: value });
   };
 
-  const toggleDropSet = () => {
-    onUpdate(index, { ...setData, isDropSet: !setData.isDropSet });
+  const setOffset = (val) => {
+    offsetXRef.current = val;
+    setOffsetX(val);
   };
 
+  const handleTouchStart = (e) => {
+    // Stop propagation so the page-level swipe (App.jsx) doesn't record this touch
+    e.stopPropagation();
+    const t = e.targetTouches[0];
+    touchRef.current = { x: t.clientX, y: t.clientY };
+    swipingRef.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!touchRef.current) return;
+    const t = e.targetTouches[0];
+    const dx = t.clientX - touchRef.current.x;
+    const dy = t.clientY - touchRef.current.y;
+
+    if (!swipingRef.current) {
+      // Wait until movement is large enough to determine direction
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      // If primarily vertical → let it scroll, abort
+      if (Math.abs(dy) > Math.abs(dx) * 0.7) {
+        touchRef.current = null;
+        return;
+      }
+      swipingRef.current = true;
+    }
+
+    // Committed to horizontal swipe — stop page swipe from also firing
+    e.stopPropagation();
+    // First set cannot swipe right (DS not allowed on set 1)
+    const maxRight = isFirst ? 0 : 90;
+    const clamped = Math.max(-90, Math.min(maxRight, dx));
+    setOffset(clamped);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!swipingRef.current) {
+      touchRef.current = null;
+      return;
+    }
+    touchRef.current = null;
+    swipingRef.current = false;
+    e.stopPropagation();
+
+    const cur = offsetXRef.current;
+    if (cur > 60 && !isFirst) {
+      // Toggle drop set
+      onUpdate(index, { ...setData, isDropSet: !setData.isDropSet });
+      setOffset(0);
+    } else if (cur < -60) {
+      // Slide out and delete
+      setOffset(-400);
+      setTimeout(() => onDelete(index), 200);
+    } else {
+      // Snap back
+      setOffset(0);
+    }
+  };
+
+  const dsOpacity = Math.min(1, Math.max(0, offsetXRef.current / 60));
+  const delOpacity = Math.min(1, Math.max(0, -offsetXRef.current / 60));
+
   return (
-    <div className={`set-row${setData.isDropSet ? " set-row-dropset" : ""}`}>
-      <span className="set-number">{index + 1}</span>
-      <input
-        type="number"
-        className="input input-sm"
-        placeholder="—"
-        value={setData.weight ?? ""}
-        onChange={(e) => handleChange("weight", e.target.value === "" ? null : parseFloat(e.target.value))}
-        min="0"
-        step="0.5"
-      />
-      <input
-        type="number"
-        className="input input-sm"
-        placeholder="—"
-        value={setData.reps ?? ""}
-        onChange={(e) => handleChange("reps", e.target.value === "" ? null : parseInt(e.target.value))}
-        min="0"
-      />
-      <input
-        type="number"
-        className="input input-sm"
-        placeholder="—"
-        value={setData.rpe ?? ""}
-        onChange={(e) => handleChange("rpe", e.target.value === "" ? null : parseFloat(e.target.value))}
-        min="1" max="10" step="0.5"
-      />
+    <div className="set-row-wrapper">
+      {/* Left reveal — DS (green) */}
+      <div className="swipe-reveal swipe-reveal-left" style={{ opacity: dsOpacity }}>
+        <span>DS</span>
+      </div>
+      {/* Right reveal — Delete (red) */}
+      <div className="swipe-reveal swipe-reveal-right" style={{ opacity: delOpacity }}>
+        <Trash2 size={14} />
+      </div>
 
-      {/* DS — hidden on first set */}
-      {!isFirst ? (
-        <button
-          className={`ds-badge ${setData.isDropSet ? "active" : "inactive"}`}
-          onClick={(e) => { e.stopPropagation(); toggleDropSet(); }}
-          title="Toggle Drop Set"
-        >
-          DS
-        </button>
-      ) : (
-        <span />
-      )}
+      <div
+        className={`set-row${setData.isDropSet ? " set-row-dropset" : ""}`}
+        style={{
+          transform: `translateX(${offsetX}px)`,
+          transition: swipingRef.current ? 'none' : 'transform 200ms ease',
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <span className="set-number">{index + 1}</span>
+        <input
+          type="number"
+          className="input input-sm"
+          placeholder="—"
+          value={setData.weight ?? ""}
+          onChange={(e) => handleChange("weight", e.target.value === "" ? null : parseFloat(e.target.value))}
+          min="0"
+          step="0.5"
+        />
+        <input
+          type="number"
+          className="input input-sm"
+          placeholder="—"
+          value={setData.reps ?? ""}
+          onChange={(e) => handleChange("reps", e.target.value === "" ? null : parseInt(e.target.value))}
+          min="0"
+        />
+        <input
+          type="number"
+          className="input input-sm"
+          placeholder="—"
+          value={setData.rpe ?? ""}
+          onChange={(e) => handleChange("rpe", e.target.value === "" ? null : parseFloat(e.target.value))}
+          min="1" max="10" step="0.5"
+        />
 
-      {/* Up / Down / Delete — arrows hidden until hover via CSS .move-btn */}
-      <div className="set-actions">
-        <button
-          className="btn btn-ghost btn-icon move-btn"
-          onClick={(e) => { e.stopPropagation(); onMoveUp(index); }}
-          disabled={isFirst}
-          title="Move up"
-          style={{ padding: "2px", color: isFirst ? "transparent" : "var(--text-muted)", pointerEvents: isFirst ? "none" : "auto" }}
-        >
-          <ChevronUp size={14} />
-        </button>
-        <button
-          className="btn btn-ghost btn-icon move-btn"
-          onClick={(e) => { e.stopPropagation(); onMoveDown(index); }}
-          disabled={isLast}
-          title="Move down"
-          style={{ padding: "2px", color: isLast ? "transparent" : "var(--text-muted)", pointerEvents: isLast ? "none" : "auto" }}
-        >
-          <ChevronDown size={14} />
-        </button>
-        <button
-          className="btn btn-ghost btn-icon"
-          onClick={(e) => { e.stopPropagation(); onDelete(index); }}
-          title="Delete set"
-          style={{ padding: "2px", color: "var(--text-muted)" }}
-        >
-          <Trash2 size={13} />
-        </button>
+        {/* Up / Down / Delete — arrows hidden until hover via CSS .move-btn */}
+        <div className="set-actions">
+          <button
+            className="btn btn-ghost btn-icon move-btn"
+            onClick={(e) => { e.stopPropagation(); onMoveUp(index); }}
+            disabled={isFirst}
+            title="Move up"
+            style={{ padding: "2px", color: isFirst ? "transparent" : "var(--text-muted)", pointerEvents: isFirst ? "none" : "auto" }}
+          >
+            <ChevronUp size={14} />
+          </button>
+          <button
+            className="btn btn-ghost btn-icon move-btn"
+            onClick={(e) => { e.stopPropagation(); onMoveDown(index); }}
+            disabled={isLast}
+            title="Move down"
+            style={{ padding: "2px", color: isLast ? "transparent" : "var(--text-muted)", pointerEvents: isLast ? "none" : "auto" }}
+          >
+            <ChevronDown size={14} />
+          </button>
+          <button
+            className="btn btn-ghost btn-icon"
+            onClick={(e) => { e.stopPropagation(); onDelete(index); }}
+            title="Delete set"
+            style={{ padding: "2px", color: "var(--text-muted)" }}
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -176,14 +249,85 @@ export default function ExerciseCard({
   exercise,
   sets,
   onSetsChange,
-  onSetsChangeAndScroll,
-  onNameChange,       // only set for new (temp) exercises
-  onExerciseResolved, // called when user picks from autocomplete: (exercise, prefillSets)
+  onSetsChangeAndScroll,  // (newSets, cardEl) — WorkoutsPage decides whether to scroll
+  onNameChange,           // only set for new (temp) exercises
+  onExerciseResolved,     // called when user picks from autocomplete: (exercise, prefillSets)
   onDelete,
   orderIndex,
+  onMoveExercise,         // (fromIndex, toIndex) — for drag reorder
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const cardRef = useRef(null);
+  const gripRef = useRef(null);
 
+  // ── Touch-drag reorder (mobile) ──────────────────────────────────────────
+  useEffect(() => {
+    const grip = gripRef.current;
+    if (!grip || !onMoveExercise) return;
+
+    let isDraggingTouch = false;
+    let longPressTimer = null;
+
+    const onTouchMoveActive = (e) => {
+      if (!isDraggingTouch) return;
+      e.preventDefault(); // prevent scroll while dragging
+      const touch = e.targetTouches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const targetCard = el?.closest('[data-exercise-index]');
+      // Update drag-over highlight
+      document.querySelectorAll('[data-exercise-index]').forEach(c => c.classList.remove('drag-over'));
+      if (targetCard) targetCard.classList.add('drag-over');
+    };
+
+    const onTouchStart = (e) => {
+      e.stopPropagation();
+      longPressTimer = setTimeout(() => {
+        isDraggingTouch = true;
+        cardRef.current?.classList.add('is-dragging');
+        document.addEventListener('touchmove', onTouchMoveActive, { passive: false });
+      }, 320);
+    };
+
+    const onTouchEnd = (e) => {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+      document.removeEventListener('touchmove', onTouchMoveActive);
+
+      if (isDraggingTouch) {
+        isDraggingTouch = false;
+        const touch = e.changedTouches[0];
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        const targetCard = el?.closest('[data-exercise-index]');
+        // Clean up visual state
+        document.querySelectorAll('[data-exercise-index]').forEach(c => {
+          c.classList.remove('is-dragging');
+          c.classList.remove('drag-over');
+        });
+        if (targetCard) {
+          const toIndex = parseInt(targetCard.getAttribute('data-exercise-index'), 10);
+          if (!isNaN(toIndex) && toIndex !== orderIndex) {
+            onMoveExercise(orderIndex, toIndex);
+          }
+        }
+      }
+    };
+
+    grip.addEventListener('touchstart', onTouchStart, { passive: true });
+    grip.addEventListener('touchend', onTouchEnd);
+    grip.addEventListener('touchcancel', onTouchEnd);
+
+    return () => {
+      grip.removeEventListener('touchstart', onTouchStart);
+      grip.removeEventListener('touchend', onTouchEnd);
+      grip.removeEventListener('touchcancel', onTouchEnd);
+      document.removeEventListener('touchmove', onTouchMoveActive);
+      clearTimeout(longPressTimer);
+    };
+  }, [orderIndex, onMoveExercise]);
+
+  // ── Set operations ───────────────────────────────────────────────────────
   const handleUpdateSet = useCallback((idx, updated) => {
     const newSets = [...sets];
     newSets[idx] = updated;
@@ -197,15 +341,9 @@ export default function ExerciseCard({
   const handleAddSet = () => {
     const newSets = [
       ...sets,
-      {
-        setNumber: sets.length + 1,
-        weight: null,
-        reps: null,
-        rpe: null,
-        isDropSet: false,
-      },
+      { setNumber: sets.length + 1, weight: null, reps: null, rpe: null, isDropSet: false },
     ];
-    if (onSetsChangeAndScroll) onSetsChangeAndScroll(newSets);
+    if (onSetsChangeAndScroll) onSetsChangeAndScroll(newSets, cardRef.current);
     else onSetsChange(newSets);
   };
 
@@ -213,7 +351,7 @@ export default function ExerciseCard({
     const last = sets[sets.length - 1];
     if (!last) return handleAddSet();
     const newSets = [...sets, { ...last, id: undefined, isDropSet: false, setNumber: sets.length + 1 }];
-    if (onSetsChangeAndScroll) onSetsChangeAndScroll(newSets);
+    if (onSetsChangeAndScroll) onSetsChangeAndScroll(newSets, cardRef.current);
     else onSetsChange(newSets);
   };
 
@@ -231,9 +369,65 @@ export default function ExerciseCard({
     onSetsChange(newSets);
   };
 
+  // ── HTML5 Drag & Drop (desktop) ──────────────────────────────────────────
+  const handleDragStart = (e) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(orderIndex));
+    // Slight delay so drag image renders before opacity change
+    requestAnimationFrame(() => setIsDragging(true));
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (!isDragOver) setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    if (!e.relatedTarget || !cardRef.current?.contains(e.relatedTarget)) {
+      setIsDragOver(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    if (!isNaN(fromIndex) && fromIndex !== orderIndex && onMoveExercise) {
+      onMoveExercise(fromIndex, orderIndex);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setIsDragOver(false);
+  };
+
   return (
-    <div className="exercise-card">
+    <div
+      ref={cardRef}
+      className={`exercise-card${isDragging ? ' is-dragging' : ''}${isDragOver ? ' is-drag-over' : ''}`}
+      data-exercise-index={orderIndex}
+      onDragOver={onMoveExercise ? handleDragOver : undefined}
+      onDragLeave={onMoveExercise ? handleDragLeave : undefined}
+      onDrop={onMoveExercise ? handleDrop : undefined}
+    >
       <div className="exercise-card-header" onClick={() => setCollapsed((c) => !c)}>
+        {/* Drag handle — only rendered when reorder is supported */}
+        {onMoveExercise && (
+          <div
+            ref={gripRef}
+            className="drag-handle"
+            draggable="true"
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onClick={(e) => e.stopPropagation()}
+            title="Drag to reorder"
+          >
+            <GripVertical size={16} />
+          </div>
+        )}
+
         {/* Editable name with autocomplete for new exercises */}
         {onNameChange ? (
           <ExerciseNameInput
@@ -273,7 +467,6 @@ export default function ExerciseCard({
             <span>Weight (kg)</span>
             <span>Reps</span>
             <span>RPE</span>
-            <span>DS</span>
             <span></span>
           </div>
 

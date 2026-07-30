@@ -229,14 +229,14 @@ export default function WorkoutsPage() {
     })
   }, [])
 
-  const scrollToBottomIfNearBottom = useCallback(() => {
+  // Only scroll when the card's bottom edge is actually below the visible area
+  const scrollIfCardBottomOutOfView = useCallback((cardEl) => {
     requestAnimationFrame(() => {
-      const el = scrollableRef.current
-      if (el && exercisesEndRef.current) {
-        const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 250
-        if (isNearBottom) {
-          exercisesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
-        }
+      if (!cardEl || !exercisesEndRef.current) return
+      const cardBottom = cardEl.getBoundingClientRect().bottom
+      const viewportBottom = window.innerHeight
+      if (cardBottom > viewportBottom - 80) {
+        exercisesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
       }
     })
   }, [])
@@ -374,6 +374,16 @@ export default function WorkoutsPage() {
     })
   }, [])
 
+  const moveExercise = useCallback((fromIndex, toIndex) => {
+    if (fromIndex === toIndex) return
+    setExercises(prev => {
+      const updated = [...prev]
+      const [moved] = updated.splice(fromIndex, 1)
+      updated.splice(toIndex, 0, moved)
+      return updated
+    })
+  }, [])
+
   const updateExerciseName = useCallback((index, name) => {
     setExercises(prev => {
       const updated = [...prev]
@@ -493,11 +503,12 @@ export default function WorkoutsPage() {
                     exercise={we.exercise}
                     sets={we.sets}
                     onSetsChange={(newSets) => updateExerciseSets(i, newSets)}
-                    onSetsChangeAndScroll={(newSets) => { updateExerciseSets(i, newSets); scrollToBottomIfNearBottom() }}
+                    onSetsChangeAndScroll={(newSets, cardEl) => { updateExerciseSets(i, newSets); scrollIfCardBottomOutOfView(cardEl) }}
                     onNameChange={we.exercise._isNew ? (name) => updateExerciseName(i, name) : null}
                     onExerciseResolved={we.exercise._isNew ? (ex, prefillSets) => resolveExercise(i, ex, prefillSets) : null}
                     onDelete={() => deleteExercise(i)}
                     orderIndex={i}
+                    onMoveExercise={moveExercise}
                   />
                 ))}
                 <div ref={exercisesEndRef} />
