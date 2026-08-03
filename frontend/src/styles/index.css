@@ -780,13 +780,12 @@ textarea.input {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0;
+  justify-self: end;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 7px;
   overflow: hidden;
   width: 32px;
-  margin-left: auto;
 }
 
 .set-move-btn {
