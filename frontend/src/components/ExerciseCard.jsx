@@ -210,25 +210,23 @@ function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp,
           min="1" max="10" step="0.5"
         />
 
-        {/* Up / Down arrows */}
-        <div className="set-actions">
+        {/* Up / Down stacked pill */}
+        <div className="set-move-pill">
           <button
-            className="btn btn-ghost btn-icon move-btn"
+            className="set-move-btn"
             onClick={(e) => { e.stopPropagation(); onMoveUp(index); }}
             disabled={isFirst}
             title="Move up"
-            style={{ padding: "2px", color: isFirst ? "transparent" : "var(--text-muted)", pointerEvents: isFirst ? "none" : "auto" }}
           >
-            <ChevronUp size={14} />
+            <ChevronUp size={13} />
           </button>
           <button
-            className="btn btn-ghost btn-icon move-btn"
+            className="set-move-btn"
             onClick={(e) => { e.stopPropagation(); onMoveDown(index); }}
             disabled={isLast}
             title="Move down"
-            style={{ padding: "2px", color: isLast ? "transparent" : "var(--text-muted)", pointerEvents: isLast ? "none" : "auto" }}
           >
-            <ChevronDown size={14} />
+            <ChevronDown size={13} />
           </button>
         </div>
       </div>

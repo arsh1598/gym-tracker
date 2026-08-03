@@ -765,16 +765,7 @@ textarea.input {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.18);
 }
-/* Hide arrows by default, show on row hover */
-.set-row .set-actions .move-btn {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity var(--transition-fast);
-}
-.set-row:hover .set-actions .move-btn {
-  opacity: 1;
-  pointer-events: auto;
-}
+/* Hide arrows comment retained; move-btn no longer used — replaced by set-move-pill */
 
 .set-number {
   font-size: 0.8rem;
@@ -783,11 +774,44 @@ textarea.input {
   font-weight: 500;
 }
 
-.set-actions {
+/* Stacked up/down arrow pill */
+.set-move-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  overflow: hidden;
+  width: 32px;
+  margin-left: auto;
+}
+
+.set-move-btn {
   display: flex;
   align-items: center;
-  gap: 2px;
-  justify-content: flex-end;
+  justify-content: center;
+  width: 100%;
+  padding: 3px 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  line-height: 1;
+}
+.set-move-btn:first-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.set-move-btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--text-accent);
+}
+.set-move-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
 }
 
 /* ── Drag-to-reorder handle & states ─────────────────────────────────────── */
