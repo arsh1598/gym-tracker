@@ -704,7 +704,7 @@ textarea.input {
 /* set-row grid: [#] [weight] [reps] [rpe] [↑↓🗑] */
 .sets-table-header {
   display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 72px;
+  grid-template-columns: 24px 1fr 1fr 1fr 46px;
   gap: 6px;
   align-items: center;
   padding: 0 0 6px;
@@ -750,7 +750,7 @@ textarea.input {
 
 .set-row {
   display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 72px;
+  grid-template-columns: 24px 1fr 1fr 1fr 46px;
   gap: 6px;
   align-items: center;
   border-radius: 8px;
@@ -767,8 +767,8 @@ textarea.input {
 }
 /* Hide arrows by default, show on row hover */
 .set-row .set-actions .move-btn {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 1;
+  pointer-events: auto;
   transition: opacity var(--transition-fast);
 }
 .set-row:hover .set-actions .move-btn {

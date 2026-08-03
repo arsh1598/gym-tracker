@@ -210,7 +210,7 @@ function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp,
           min="1" max="10" step="0.5"
         />
 
-        {/* Up / Down / Delete — arrows hidden until hover via CSS .move-btn */}
+        {/* Up / Down arrows */}
         <div className="set-actions">
           <button
             className="btn btn-ghost btn-icon move-btn"
@@ -229,14 +229,6 @@ function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp,
             style={{ padding: "2px", color: isLast ? "transparent" : "var(--text-muted)", pointerEvents: isLast ? "none" : "auto" }}
           >
             <ChevronDown size={14} />
-          </button>
-          <button
-            className="btn btn-ghost btn-icon"
-            onClick={(e) => { e.stopPropagation(); onDelete(index); }}
-            title="Delete set"
-            style={{ padding: "2px", color: "var(--text-muted)" }}
-          >
-            <Trash2 size={13} />
           </button>
         </div>
       </div>
