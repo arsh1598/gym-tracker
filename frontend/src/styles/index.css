@@ -704,7 +704,7 @@ textarea.input {
 /* set-row grid: [#] [weight] [reps] [rpe] [↑↓🗑] */
 .sets-table-header {
   display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 46px;
+  grid-template-columns: 24px 1fr 1fr 1fr 52px;
   gap: 6px;
   align-items: center;
   padding: 0 0 6px;
@@ -721,6 +721,7 @@ textarea.input {
   margin-bottom: 7px;
   border-radius: 8px;
   overflow: hidden;
+  max-height: 80px;
 }
 
 .swipe-reveal {
@@ -750,7 +751,7 @@ textarea.input {
 
 .set-row {
   display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 46px;
+  grid-template-columns: 24px 1fr 1fr 1fr 52px;
   gap: 6px;
   align-items: center;
   border-radius: 8px;
@@ -774,10 +775,10 @@ textarea.input {
   font-weight: 500;
 }
 
-/* Stacked up/down arrow pill */
+/* Side-by-side up/down arrow pill */
 .set-move-pill {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   justify-self: end;
@@ -785,15 +786,15 @@ textarea.input {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 7px;
   overflow: hidden;
-  width: 32px;
+  width: 48px;
 }
 
 .set-move-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 3px 0;
+  flex: 1;
+  padding: 5px 0;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -802,7 +803,7 @@ textarea.input {
   line-height: 1;
 }
 .set-move-btn:first-child {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
 }
 .set-move-btn:hover:not(:disabled) {
   background: rgba(139, 92, 246, 0.18);

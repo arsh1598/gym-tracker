@@ -88,6 +88,7 @@ function ExerciseNameInput({ value, onChange, onSelectExercise }) {
 // ── Set row with swipe-to-DS (right) / swipe-to-delete (left) ────────────────
 function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp, onMoveDown }) {
   const [offsetX, setOffsetX] = useState(0);
+  const [deleting, setDeleting] = useState(false);
   const touchRef = useRef(null);      // { x, y } at touchstart
   const swipingRef = useRef(false);   // true once committed to horizontal swipe
   // We need to read offsetX inside handleTouchEnd without stale closure
@@ -150,9 +151,9 @@ function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp,
       onUpdate(index, { ...setData, isDropSet: !setData.isDropSet });
       setOffset(0);
     } else if (cur < -60) {
-      // Slide out and delete
-      setOffset(-400);
-      setTimeout(() => onDelete(index), 200);
+      // Collapse the whole wrapper then delete — prevents the reveal ghost
+      setDeleting(true);
+      setTimeout(() => onDelete(index), 280);
     } else {
       // Snap back
       setOffset(0);
@@ -163,7 +164,10 @@ function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp,
   const delOpacity = Math.min(1, Math.max(0, -offsetXRef.current / 60));
 
   return (
-    <div className="set-row-wrapper">
+    <div
+      className="set-row-wrapper"
+      style={deleting ? { maxHeight: 0, opacity: 0, marginBottom: 0, overflow: 'hidden', transition: 'max-height 250ms ease, opacity 200ms ease, margin-bottom 250ms ease' } : { maxHeight: 80, transition: 'max-height 250ms ease, opacity 200ms ease, margin-bottom 250ms ease' }}
+    >
       {/* Left reveal — DS (green) */}
       <div className="swipe-reveal swipe-reveal-left" style={{ opacity: dsOpacity }}>
         <span>DS</span>
@@ -210,7 +214,7 @@ function SetRow({ setData, index, onUpdate, onDelete, isFirst, isLast, onMoveUp,
           min="1" max="10" step="0.5"
         />
 
-        {/* Up / Down stacked pill */}
+        {/* Up / Down side-by-side pill */}
         <div className="set-move-pill">
           <button
             className="set-move-btn"
