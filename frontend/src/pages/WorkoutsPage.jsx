@@ -170,8 +170,10 @@ function DeleteConfirmModal({ date, onConfirm, onCancel, deleting }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+let _wpUidSeq = 0;
+const wpUid = () => `w${++_wpUidSeq}`;
 const newSet = (override = {}) => ({
-  setNumber: 1, weight: null, reps: null, rpe: null, isDropSet: false, ...override
+  setNumber: 1, weight: null, reps: null, rpe: null, isDropSet: false, _uid: wpUid(), ...override
 })
 
 export default function WorkoutsPage() {
@@ -257,7 +259,7 @@ export default function WorkoutsPage() {
     setNotes(workout.notes || '')
     setExercises(workout.workoutExercises.map(we => ({
       exercise: we.exercise,
-      sets: we.sets.map(s => ({ ...s, id: undefined })),
+      sets: we.sets.map(s => ({ ...s, id: undefined, _uid: wpUid() })),
     })))
     toast('Previous workout loaded!', 'success')
   }, [toast])
@@ -267,7 +269,7 @@ export default function WorkoutsPage() {
     setNotes(workout.notes || '')
     setExercises(workout.workoutExercises.map(we => ({
       exercise: we.exercise,
-      sets: we.sets.map(s => ({ ...s, id: undefined })),
+      sets: we.sets.map(s => ({ ...s, id: undefined, _uid: wpUid() })),
     })))
     toast('Workout loaded from title!', 'success')
   }, [toast])

@@ -2,6 +2,11 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { Trash2, Copy, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
 import { getAllExercises, getLastSets } from "../api/client";
 
+// Stable UID for set rows — avoids React key collisions on deletion
+let _uidSeq = 0;
+const mkUid = () => `u${++_uidSeq}`;
+
+
 // ── Exercise name autocomplete ────────────────────────────────────────────────
 function ExerciseNameInput({ value, onChange, onSelectExercise }) {
   const [allExercises, setAllExercises] = useState([]);
@@ -335,7 +340,7 @@ export default function ExerciseCard({
   const handleAddSet = () => {
     const newSets = [
       ...sets,
-      { setNumber: sets.length + 1, weight: null, reps: null, rpe: null, isDropSet: false },
+      { setNumber: sets.length + 1, weight: null, reps: null, rpe: null, isDropSet: false, _uid: mkUid() },
     ];
     if (onSetsChangeAndScroll) onSetsChangeAndScroll(newSets, cardRef.current);
     else onSetsChange(newSets);
@@ -344,7 +349,7 @@ export default function ExerciseCard({
   const handleDuplicate = () => {
     const last = sets[sets.length - 1];
     if (!last) return handleAddSet();
-    const newSets = [...sets, { ...last, id: undefined, isDropSet: false, setNumber: sets.length + 1 }];
+    const newSets = [...sets, { ...last, id: undefined, _uid: mkUid(), isDropSet: false, setNumber: sets.length + 1 }];
     if (onSetsChangeAndScroll) onSetsChangeAndScroll(newSets, cardRef.current);
     else onSetsChange(newSets);
   };
@@ -466,7 +471,7 @@ export default function ExerciseCard({
 
           {sets.map((set, idx) => (
             <SetRow
-              key={idx}
+              key={set.id ?? set._uid ?? idx}
               setData={set}
               index={idx}
               onUpdate={handleUpdateSet}
