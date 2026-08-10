@@ -117,19 +117,32 @@ export default function ExercisesPage() {
                           style={{ background: MUSCLE_COLORS[ex.targetMuscle] || '#6b7280' }}
                         />
                         {ex.name}
+                        {ex.isDefault && <span className="default-badge">Default</span>}
                       </div>
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <select
-                        className="muscle-select"
-                        value={ex.targetMuscle || ''}
-                        onChange={e => handleMuscleChange(ex.id, e.target.value)}
-                      >
-                        <option value="">None</option>
-                        {MUSCLE_GROUPS.map(m => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
-                      </select>
+                      {ex.isDefault ? (
+                        <span
+                          className="muscle-badge-readonly"
+                          style={{
+                            background: (MUSCLE_COLORS[ex.targetMuscle] || '#6b7280') + '22',
+                            color: MUSCLE_COLORS[ex.targetMuscle] || '#6b7280'
+                          }}
+                        >
+                          {ex.targetMuscle || 'None'}
+                        </span>
+                      ) : (
+                        <select
+                          className="muscle-select"
+                          value={ex.targetMuscle || ''}
+                          onChange={e => handleMuscleChange(ex.id, e.target.value)}
+                        >
+                          <option value="">None</option>
+                          {MUSCLE_GROUPS.map(m => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </select>
+                      )}
                     </td>
                   </tr>
                 ))

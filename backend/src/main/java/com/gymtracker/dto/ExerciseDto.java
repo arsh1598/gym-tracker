@@ -13,4 +13,5 @@ public class ExerciseDto {
     private Long id;
     private String name;
     private String targetMuscle;
+    private boolean isDefault;
 }

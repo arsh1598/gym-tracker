@@ -68,6 +68,7 @@ public class ExerciseService {
                 .id(exercise.getId())
                 .name(exercise.getName())
                 .targetMuscle(exercise.getTargetMuscle())
+                .isDefault(exercise.getUserId() == null)
                 .build();
     }
 }
