@@ -1012,6 +1012,7 @@ textarea.input {
   padding: 24px;
   width: 520px;
   height: 70vh;
+  height: 70dvh;
   max-height: 600px;
   display: flex;
   flex-direction: column;
@@ -1061,6 +1062,9 @@ textarea.input {
 
 .exercise-list-scroll {
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
   flex: 1;
   min-height: 0;
   padding-right: 4px;

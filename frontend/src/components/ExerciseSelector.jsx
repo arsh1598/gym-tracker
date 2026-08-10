@@ -43,8 +43,8 @@ export default function ExerciseSelector({ onSelect, onClose }) {
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay" onMouseDown={onClose} onTouchEnd={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="modal" onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">Add Exercise</h3>
           <button className="btn btn-ghost btn-icon" onClick={onClose}>
@@ -63,7 +63,7 @@ export default function ExerciseSelector({ onSelect, onClose }) {
           />
         </div>
 
-        <div className="exercise-list-scroll">
+        <div className="exercise-list-scroll" onTouchStart={e => e.stopPropagation()} onTouchMove={e => e.stopPropagation()}>
           {filtered.length === 0 && !addingNew && (
             <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px', fontSize: '0.875rem' }}>
               No exercises found
