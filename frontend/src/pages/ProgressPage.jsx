@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { getAllExercises, getExerciseProgress, getMuscleVolumeProgress, getRecentlyLoggedExercises } from '../api/client'
 import { MUSCLE_COLORS } from '../utils/muscleColors'
+import { useAuth } from '../context/AuthContext'
 
 const METRICS = [
   { key: 'maxWeight', label: 'Max Weight' },
@@ -53,6 +54,7 @@ const VolumeTooltip = ({ active, payload, label }) => {
 }
 
 export default function ProgressPage() {
+  const { user } = useAuth()
   const [viewMode, setViewMode] = useState('exercise') // 'exercise' or 'volume'
   const [exercises, setExercises] = useState([])
   const [selectedExercise, setSelectedExercise] = useState(null)
@@ -85,7 +87,7 @@ export default function ProgressPage() {
   useEffect(() => {
     getAllExercises().then(data => setExercises(data.sort((a, b) => a.name.localeCompare(b.name)))).catch(() => {})
     getRecentlyLoggedExercises(10).then(setRecentExercises).catch(() => {})
-  }, [])
+  }, [user?.id])
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -106,7 +108,7 @@ export default function ProgressPage() {
       .then(data => setChartData(data.map(d => ({ ...d, date: format(new Date(d.date + 'T00:00:00'), 'MMM d') }))))
       .catch(() => setChartData([]))
       .finally(() => setLoadingChart(false))
-  }, [viewMode, selectedExercise, startDate, endDate])
+  }, [viewMode, selectedExercise, startDate, endDate, user?.id])
 
   // Fetch Volume Progress
   useEffect(() => {
@@ -154,7 +156,7 @@ export default function ProgressPage() {
       })
       .catch(() => setVolumeData([]))
       .finally(() => setLoadingChart(false))
-  }, [viewMode, startDate, endDate])
+  }, [viewMode, startDate, endDate, user?.id])
 
 
 

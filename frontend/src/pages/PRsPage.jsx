@@ -3,6 +3,7 @@ import { Trophy, Search, X } from 'lucide-react'
 import { format } from 'date-fns'
 import { getAllPRs, getAllExercises, getPRForExercise } from '../api/client'
 import { MUSCLE_COLORS } from '../utils/muscleColors'
+import { useAuth } from '../context/AuthContext'
 
 function PRCard({ pr, highlight = false }) {
   const color = MUSCLE_COLORS[pr.targetMuscle] || MUSCLE_COLORS.Other
@@ -38,6 +39,7 @@ function PRCard({ pr, highlight = false }) {
 }
 
 export default function PRsPage() {
+  const { user } = useAuth()
   const [allPRs, setAllPRs] = useState([])
   const [exercises, setExercises] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -47,6 +49,7 @@ export default function PRsPage() {
   const [showSuggestions, setShowSuggestions] = useState(false)
 
   useEffect(() => {
+    setLoading(true)
     Promise.all([getAllPRs(), getAllExercises()])
       .then(([prs, exs]) => {
         setAllPRs(prs)
@@ -54,7 +57,7 @@ export default function PRsPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [user?.id])
 
   const filteredExercises = exercises.filter(e =>
     e.name.toLowerCase().includes(searchQuery.toLowerCase())

@@ -4,6 +4,7 @@ import { History, Save, Plus, ChevronDown, Trash2, Calendar, Activity, X } from 
 import CalendarPanel from '../components/CalendarPanel'
 import ExerciseCard from '../components/ExerciseCard'
 import { useToast } from '../components/ToastProvider'
+import { useAuth } from '../context/AuthContext'
 import {
   getWorkoutByDate, saveWorkout, deleteWorkoutByDate, getRecentWorkouts,
   getWorkoutById, getAllExercises, createExercise, getAllPRs
@@ -178,6 +179,7 @@ const newSet = (override = {}) => ({
 
 export default function WorkoutsPage() {
   const toast = useToast()
+  const { user } = useAuth()
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
@@ -221,7 +223,7 @@ export default function WorkoutsPage() {
         setExercises([])
       })
       .finally(() => setLoading(false))
-  }, [selectedDate])
+  }, [selectedDate, user?.id])
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {

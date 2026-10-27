@@ -21,9 +21,12 @@ public interface WorkoutExerciseRepository extends JpaRepository<WorkoutExercise
             JOIN FETCH we.workout w
             JOIN FETCH we.sets s
             WHERE we.exercise.id = :exerciseId
+            AND w.userId = :userId
             ORDER BY w.date DESC
             """)
-    List<WorkoutExercise> findLatestByExerciseId(@Param("exerciseId") Long exerciseId);
+    List<WorkoutExercise> findLatestByExerciseId(
+            @Param("exerciseId") Long exerciseId,
+            @Param("userId") String userId);
 
     /**
      * Find recently logged exercises, ordered by most recent workout date (for dropdown).
@@ -32,7 +35,10 @@ public interface WorkoutExerciseRepository extends JpaRepository<WorkoutExercise
             SELECT we FROM WorkoutExercise we
             JOIN FETCH we.exercise e
             JOIN we.workout w
+            WHERE w.userId = :userId
             ORDER BY w.date DESC
             """)
-    List<WorkoutExercise> findAllOrderByWorkoutDateDesc(org.springframework.data.domain.Pageable pageable);
+    List<WorkoutExercise> findAllOrderByWorkoutDateDesc(
+            @Param("userId") String userId,
+            org.springframework.data.domain.Pageable pageable);
 }

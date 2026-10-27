@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ListChecks, Search } from 'lucide-react'
 import { getAllExercises, updateExercise } from '../api/client'
 import { useToast } from '../components/ToastProvider'
+import { useAuth } from '../context/AuthContext'
 
 const MUSCLE_GROUPS = ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Legs', 'Core']
 const MUSCLE_COLORS = {
@@ -16,17 +17,19 @@ function muscleCount(exercises, muscle) {
 
 export default function ExercisesPage() {
   const toast = useToast()
+  const { user } = useAuth()
   const [exercises, setExercises] = useState([])
   const [filteredMuscle, setFilteredMuscle] = useState(null)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    setLoading(true)
     getAllExercises()
       .then(data => setExercises(data.sort((a, b) => a.name.localeCompare(b.name))))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [user?.id])
 
   const handleMuscleChange = async (id, muscle) => {
     const ex = exercises.find(e => e.id === id)

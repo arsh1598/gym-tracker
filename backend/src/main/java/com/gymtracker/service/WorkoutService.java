@@ -122,7 +122,7 @@ public class WorkoutService {
     public List<ExerciseDto> getRecentlyLoggedExercises(int limit) {
         // Fetch a larger batch ordered by date desc, then deduplicate by exercise id
         List<WorkoutExercise> recent = workoutExerciseRepository
-                .findAllOrderByWorkoutDateDesc(PageRequest.of(0, limit * 10));
+                .findAllOrderByWorkoutDateDesc(SecurityUtils.getCurrentUserId(), PageRequest.of(0, limit * 10));
         LinkedHashMap<Long, ExerciseDto> seen = new LinkedHashMap<>();
         for (WorkoutExercise we : recent) {
             if (seen.size() >= limit) break;
@@ -151,7 +151,8 @@ public class WorkoutService {
      */
     @Transactional(readOnly = true)
     public Optional<WorkoutExerciseDto> getLastPerformedSets(Long exerciseId) {
-        List<WorkoutExercise> results = workoutExerciseRepository.findLatestByExerciseId(exerciseId);
+        List<WorkoutExercise> results = workoutExerciseRepository.findLatestByExerciseId(
+                exerciseId, SecurityUtils.getCurrentUserId());
         if (results.isEmpty()) return Optional.empty();
 
         // Take the most recent one
